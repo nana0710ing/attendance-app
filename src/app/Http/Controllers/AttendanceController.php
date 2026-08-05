@@ -195,4 +195,15 @@ class AttendanceController extends Controller
             ->route('attendance.detail', $attendance->id)
             ->with('message', '勤怠情報を修正しました');
     }
+
+    public function requestList(Request $request)
+    {
+        $status = $request->status ?? 'pending';
+
+        $attendances = Attendance::where('user_id', auth()->id())
+            ->where('approval_status', $status)
+            ->get();
+
+        return view('attendance.request_list', compact('status', 'attendances'));
+    }
 }

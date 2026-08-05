@@ -48,3 +48,10 @@ Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])
 Route::patch('/attendance/detail/{id}', [AttendanceController::class, 'update'])
     ->middleware('auth')
     ->name('attendance.update');
+
+Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requestList'])
+    ->name('request.list');
+
+Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requestList'])
+    ->middleware('auth')
+    ->name('request.list');
