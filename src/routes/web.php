@@ -36,3 +36,15 @@ Route::post('/attendance/break-start', [AttendanceController::class, 'breakStart
 Route::post('/attendance/break-end', [AttendanceController::class, 'breakEnd'])
     ->middleware('auth')
     ->name('attendance.break-end');
+
+Route::get('/attendance/list', [AttendanceController::class, 'list'])
+    ->middleware('auth')
+    ->name('attendance.list');
+
+Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])
+    ->middleware('auth')
+    ->name('attendance.detail');
+
+Route::patch('/attendance/detail/{id}', [AttendanceController::class, 'update'])
+    ->middleware('auth')
+    ->name('attendance.update');
