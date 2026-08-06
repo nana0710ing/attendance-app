@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Attendance;
 use App\Models\BreakTime;
 use Carbon\Carbon;
+use App\Models\StampCorrectionRequest;
 
 class AttendanceController extends Controller
 {
@@ -110,7 +111,11 @@ class AttendanceController extends Controller
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
-        return view('attendance.detail', compact('attendance'));
+        $pendingRequest = StampCorrectionRequest::where('attendance_id', $attendance->id)
+            ->where('approval_status', 'pending')
+            ->exists();
+
+        return view('attendance.detail', compact('attendance', 'pendingRequest'));
     }
 
     public function update(Request $request, $id)
@@ -170,7 +175,7 @@ class AttendanceController extends Controller
         $attendance = Attendance::where('user_id', auth()->id())
             ->findOrFail($id);
 
-        $attendance->update([
+        /*$attendance->update([
             'clock_in' => $request->clock_in
                 ? Carbon::parse($attendance->work_date . ' ' . $request->clock_in)
                 : null,
@@ -178,9 +183,25 @@ class AttendanceController extends Controller
                 ? Carbon::parse($attendance->work_date . ' ' . $request->clock_out)
                 : null,
             'remark' => $request->remark,
+        ]);*/
+        StampCorrectionRequest::create([
+            'attendance_id' => $attendance->id,
+            'user_id' => auth()->id(),
+
+            'clock_in' => $request->clock_in
+                ? Carbon::parse($attendance->work_date . ' ' . $request->clock_in)
+                : null,
+
+            'clock_out' => $request->clock_out
+                ? Carbon::parse($attendance->work_date . ' ' . $request->clock_out)
+                : null,
+
+            'remark' => $request->remark,
+
+            'approval_status' => 'pending',
         ]);
 
-        foreach ($attendance->breakTimes as $index => $breakTime) {
+        /*foreach ($attendance->breakTimes as $index => $breakTime) {
             $breakTime->update([
                 'break_start' => isset($request->break_start[$index])
                     ? Carbon::parse($attendance->work_date . ' ' . $request->break_start[$index])
@@ -189,7 +210,7 @@ class AttendanceController extends Controller
                     ? Carbon::parse($attendance->work_date . ' ' . $request->break_end[$index])
                     : null,
             ]);
-        }
+        }*/
 
         return redirect()
             ->route('attendance.detail', $attendance->id)
@@ -200,10 +221,10 @@ class AttendanceController extends Controller
     {
         $status = $request->status ?? 'pending';
 
-        $attendances = Attendance::where('user_id', auth()->id())
+        $requests = StampCorrectionRequest::where('user_id', auth()->id())
             ->where('approval_status', $status)
             ->get();
 
-        return view('attendance.request_list', compact('status', 'attendances'));
+        return view('attendance.request_list', compact('status', 'requests'));
     }
 }

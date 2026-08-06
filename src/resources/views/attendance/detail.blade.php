@@ -91,7 +91,11 @@
         </tr>
     </table>
 
-    <button type="submit">修正</button>
+    @if ($pendingRequest)
+        <p>※承認待ちの申請があります。</p>
+    @else
+        <button type="submit">修正</button>
+    @endif
     </form>
 </body>
 

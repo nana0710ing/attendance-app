@@ -41,15 +41,23 @@
         </thead>
 
     <tbody>
-    @foreach ($attendances as $attendance)
+    @foreach ($requests as $requestItem)
     <tr>
-        <td>{{ $attendance->approval_status }}</td>
-        <td>{{ $attendance->user->name }}</td>
-        <td>{{ $attendance->work_date }}</td>
-        <td>{{ $attendance->remark }}</td>
-        <td>{{ $attendance->updated_at->format('Y/m/d') }}</td>
         <td>
-            <a href="{{ route('attendance.detail', $attendance->id) }}">詳細</a>
+            @if ($requestItem->approval_status === 'pending')
+                承認待ち
+            @else
+                承認済み
+            @endif
+        </td>
+        <td>{{ $requestItem->user->name }}</td>
+        <td>{{ $requestItem->attendance->work_date }}</td>
+        <td>{{ $requestItem->remark }}</td>
+        <td>{{ $requestItem->created_at->format('Y/m/d') }}</td>
+        <td>
+            <a href="{{ route('attendance.detail', $requestItem->attendance_id) }}">
+                詳細
+            </a>
         </td>
     </tr>
     @endforeach
