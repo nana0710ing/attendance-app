@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\BreakTime;
 use Carbon\Carbon;
 use App\Models\StampCorrectionRequest;
+use App\Models\User;
 
 class AttendanceController extends Controller
 {
@@ -226,5 +227,181 @@ class AttendanceController extends Controller
             ->get();
 
         return view('attendance.request_list', compact('status', 'requests'));
+    }
+
+    public function adminRequestList(Request $request)
+    {
+        $status = $request->status ?? 'pending';
+
+        $requests = StampCorrectionRequest::where('approval_status', $status)
+            ->get();
+
+        return view('admin.request_list', compact('status', 'requests'));
+    }
+
+    public function staffAttendance(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $month = $request->month
+            ? Carbon::parse($request->month)
+            : now();
+
+        $attendances = Attendance::with('breakTimes')
+            ->where('user_id', $id)
+            ->whereYear('work_date', $month->year)
+            ->whereMonth('work_date', $month->month)
+            ->orderBy('work_date', 'desc')
+            ->get();
+
+        $attendances = $attendances->keyBy(function ($attendance) {
+            return \Carbon\Carbon::parse($attendance->work_date)->format('Y-m-d');
+        });
+
+        $days = collect();
+
+        $startOfMonth = $month->copy()->startOfMonth();
+        $endOfMonth = $month->copy()->endOfMonth();
+
+        for ($date = $startOfMonth->copy(); $date->lte($endOfMonth); $date->addDay()) {
+            $days->push($date->copy());
+        }
+
+        return view('admin.staff_attendance', compact(
+            'user',
+            'attendances',
+            'month',
+            'days'
+        ));
+    }
+
+    public function adminAttendanceList(Request $request)
+    {
+        $date = $request->input('date', now()->toDateString());
+
+        $attendances = Attendance::with(['user', 'breakTimes'])
+            ->whereDate('work_date', $date)
+            ->orderBy('clock_in')
+            ->get();
+
+        return view('admin.attendance_list', compact('attendances', 'date'));
+    }
+
+    public function staffList()
+    {
+        $users = User::where('is_admin', false)->get();
+
+        return view('admin.staff_list', compact('users'));
+    }
+
+    public function adminRequestDetail($id)
+    {
+        $request = StampCorrectionRequest::with(['user', 'attendance'])
+            ->findOrFail($id);
+
+        return view('admin.request_detail', compact('request'));
+    }
+
+    public function approveRequest($id)
+    {
+        $request = StampCorrectionRequest::findOrFail($id);
+
+        $attendance = $request->attendance;
+
+        $attendance->update([
+            'clock_in' => $request->clock_in,
+            'clock_out' => $request->clock_out,
+            'remark' => $request->remark,
+        ]);
+
+        $request->update([
+            'approval_status' => 'approved',
+        ]);
+
+        return redirect()
+            ->route('admin.requests.detail', $request->id);
+    }
+
+    public function adminAttendanceDetail($id)
+    {
+        $attendance = Attendance::with(['user', 'breakTimes'])
+            ->findOrFail($id);
+
+        return view('admin.staff_attendance_detail', compact('attendance'));
+    }
+
+    public function exportCsv(Request $request, User $user)
+    {
+        $month = Carbon::parse($request->month ?? now()->format('Y-m'));
+
+        $attendances = Attendance::with('breakTimes')
+            ->where('user_id', $user->id)
+            ->whereYear('work_date', $month->year)
+            ->whereMonth('work_date', $month->month)
+            ->orderBy('work_date')
+            ->get();
+
+        $fileName = $user->name . '_' . $month->format('Y-m') . '_attendance.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+        ];
+
+        $callback = function () use ($attendances) {
+            $file = fopen('php://output', 'w');
+
+            // Excelで文字化けしないように
+            fwrite($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($file, [
+                '日付',
+                '出勤',
+                '退勤',
+                '休憩',
+                '合計'
+            ]);
+
+            foreach ($attendances as $attendance) {
+
+                $breakMinutes = 0;
+
+                foreach ($attendance->breakTimes as $break) {
+                    if ($break->break_start && $break->break_end) {
+                        $breakMinutes += Carbon::parse($break->break_start)
+                            ->diffInMinutes(Carbon::parse($break->break_end));
+                    }
+                }
+
+                $workMinutes = 0;
+
+                if ($attendance->clock_in && $attendance->clock_out) {
+                    $workMinutes =
+                        Carbon::parse($attendance->clock_in)
+                            ->diffInMinutes(Carbon::parse($attendance->clock_out))
+                        - $breakMinutes;
+                }
+
+                fputcsv($file, [
+                    Carbon::parse($attendance->work_date)->format('Y/m/d'),
+
+                    $attendance->clock_in
+                        ? Carbon::parse($attendance->clock_in)->format('H:i')
+                        : '',
+
+                    $attendance->clock_out
+                    ? Carbon::parse($attendance->clock_out)->format('H:i')
+                        : '',
+
+                    sprintf('%d:%02d', floor($breakMinutes / 60), $breakMinutes % 60),
+
+                    sprintf('%d:%02d', floor($workMinutes / 60), $workMinutes % 60),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

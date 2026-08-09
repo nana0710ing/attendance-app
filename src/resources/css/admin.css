@@ -1,0 +1,175 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #f3f3f3;
+}
+
+header {
+    background: #000;
+    color: #fff;
+    height: 70px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 40px;
+}
+
+header h1,
+header h2 {
+    margin: 0;
+    color: white;
+}
+
+nav {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+main {
+    width: 80%;
+    margin: 50px auto;
+}
+
+.logo img {
+    height: 28px;
+}
+
+.page-title {
+    margin-bottom: 40px;
+}
+
+.attendance-detail {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    padding: 28px 36px;
+    border-bottom: 1px solid #ddd;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row .label {
+    width: 180px;
+    font-weight: bold;
+}
+
+.page-title {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.label {
+    width: 220px;
+    font-weight: bold;
+}
+
+main {
+    max-width: 900px;
+    margin: 50px auto;
+}
+
+.page-title {
+    border-left: 8px solid #000;
+    padding-left: 20px;
+}
+
+.attendance-detail {
+    max-width: 900px;
+}
+
+main {
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.label {
+    color: #666;
+}
+
+.date-nav {
+    background: #fff;
+    padding: 18px 24px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.attendance-table th,
+.attendance-table td {
+    padding: 18px 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.attendance-table th {
+    font-weight: bold;
+    color: #666;
+}
+
+.attendance-table tr:last-child td {
+    border-bottom: none;
+}
+
+.attendance-table a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.csv-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 40px;
+}
+
+.csv-button {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 15px 45px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.date-nav a {
+    color: #737373;
+    text-decoration: none;
+    font-weight: bold;
+}
