@@ -1,0 +1,312 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f0eff2;
+    font-family: Arial, sans-serif;
+    color: #000;
+}
+
+.staff-header {
+    width: 100%;
+    height: 80px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px;
+}
+
+.staff-header__logo img {
+    width: 300px;
+    display: block;
+}
+
+.staff-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.staff-header__nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.staff-header__nav form {
+    margin: 0;
+}
+
+.staff-header__nav button {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+}
+
+.attendance-container {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 140px;
+}
+
+.attendance-status {
+    background: #c8c8c8;
+    color: #696969;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+}
+
+.attendance-date {
+    font-size: 28px;
+    margin: 0 0 20px;
+}
+
+.attendance-time {
+    font-size: 64px;
+    font-weight: bold;
+    margin: 0 0 55px;
+}
+
+.attendance-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+}
+
+.attendance-actions form {
+    margin: 0;
+}
+
+.attendance-button {
+    min-width: 160px;
+    padding: 15px 35px;
+    border: none;
+    border-radius: 10px;
+    background: #000;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.attendance-finished {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.break-button {
+    background: #fff;
+    color: #000;
+}
+
+.attendance-list-container {
+    width: 900px;
+    margin: 0 auto;
+    padding-top: 70px;
+}
+
+.page-title {
+    font-size: 30px;
+    border-left: 8px solid #000;
+    padding-left: 20px;
+    margin-bottom: 45px;
+}
+
+.month-nav {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px 25px;
+    margin-bottom: 45px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.month-nav a {
+    color: #737373;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.month-nav span {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.attendance-table th,
+.attendance-table td {
+    padding: 18px 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.attendance-table th {
+    color: #737373;
+}
+
+.attendance-table td {
+    color: #737373;
+}
+
+.attendance-table a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.month-nav form {
+    margin: 0;
+}
+
+.month-nav input[type="month"] {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+}
+
+.month-nav input[type="month"]:focus {
+    outline: none;
+}
+
+/* 申請一覧 */
+.request-list-container {
+    width: 960px;
+    margin: 70px auto;
+}
+
+.request-list-container .page-title {
+    border-left: 8px solid #000;
+    padding-left: 20px;
+    margin-bottom: 50px;
+}
+
+.request-tabs {
+    display: flex;
+    gap: 50px;
+    border-bottom: 1px solid #000;
+    margin-bottom: 45px;
+    padding-left: 50px;
+}
+
+.request-tabs a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    padding-bottom: 15px;
+}
+
+.request-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.request-table th,
+.request-table td {
+    padding: 18px 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.request-table th {
+    color: #666;
+}
+
+.request-table a {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* 勤怠詳細 */
+.attendance-detail-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 70px auto;
+}
+
+.attendance-detail-container .page-title {
+    border-left: 8px solid #000;
+    padding-left: 20px;
+    margin-bottom: 50px;
+}
+
+.attendance-detail-table {
+    width: 100%;
+    background: #fff;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.attendance-detail-table th,
+.attendance-detail-table td {
+    padding: 25px 40px;
+    border-bottom: 1px solid #ddd;
+}
+
+.attendance-detail-table th {
+    width: 30%;
+    color: #666;
+    text-align: left;
+}
+
+.attendance-detail-table input[type="time"] {
+    padding: 8px 12px;
+    font-weight: bold;
+}
+
+.attendance-detail-table textarea {
+    width: 300px;
+    min-height: 60px;
+    padding: 10px;
+    resize: vertical;
+}
+
+.attendance-detail-button {
+    display: block;
+    margin: 30px 0 0 auto;
+    padding: 10px 35px;
+    border: none;
+    border-radius: 5px;
+    background: #000;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.pending-message {
+    margin-top: 20px;
+    text-align: right;
+    color: #ff6b6b;
+    font-weight: bold;
+}

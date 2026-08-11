@@ -12,9 +12,17 @@
         ← 前月
     </a>
 
-    <strong class="current-month">
-        🗓️ {{ $month->format('Y/m') }}
-    </strong>
+    <form class="month-picker"
+      method="GET"
+      action="{{ route('admin.staff.attendance', ['id' => $user->id]) }}">
+        <input
+            class="month-input"
+            type="month"
+            name="month"
+            value="{{ $month->format('Y-m') }}"
+            onchange="this.form.submit()"
+        >
+    </form>
 
     <a href="{{ route('admin.staff.attendance', [
         'id' => $user->id,

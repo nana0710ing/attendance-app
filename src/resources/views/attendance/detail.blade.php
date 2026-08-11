@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="ja">
+@extends('layouts.staff')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>勤怠詳細</title>
-</head>
-
-<body>
-    <h1>勤怠詳細</h1>
+@section('content')
+    <div class="attendance-detail-container">
+        <h1 class="page-title">勤怠詳細</h1>
 
     @if ($errors->any())
     <div>
@@ -24,7 +18,7 @@
         @csrf
         @method('PATCH')
 
-    <table>
+    <table class="attendance-detail-table">
         <tr>
             <th>名前</th>
             <td>{{ auth()->user()->name }}</td>
@@ -92,11 +86,12 @@
     </table>
 
     @if ($pendingRequest)
-        <p>※承認待ちの申請があります。</p>
+        <p class="pending-message">
+            *承認待ちのため修正はできません。
+        </p>
     @else
-        <button type="submit">修正</button>
+        <button class="attendance-detail-button" type="submit">修正</button>
     @endif
     </form>
-</body>
-
-</html>
+    </div>
+@endsection

@@ -1,34 +1,22 @@
-<!DOCTYPE html>
-<html lang="ja">
+@extends('layouts.staff')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>申請一覧</title>
-</head>
+@section('content')
+    <div class="request-list-container">
 
-<body>
-    <h1>申請一覧</h1>
+    <h1 class="page-title">申請一覧</h1>
 
-    <div>
+    <div class="request-tabs">
         <a href="{{ route('request.list', ['status' => 'pending']) }}">
             承認待ち
         </a>
-
-        @if($status === 'pending')
-            ←
-        @endif
 
         <a href="{{ route('request.list', ['status' => 'approved']) }}">
             承認済み
         </a>
 
-        @if($status === 'approved')
-            ←
-        @endif
     </div>
 
-    <table border="1">
+    <table class="request-table">
         <thead>
             <tr>
                 <th>状態</th>
@@ -63,6 +51,5 @@
     @endforeach
     </tbody>
 </table>
-</body>
-
-</html>
+</div>
+@endsection

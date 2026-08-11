@@ -173,3 +173,138 @@ main {
     text-decoration: none;
     font-weight: bold;
 }
+
+.month-picker {
+    margin: 0;
+}
+
+.month-input {
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.month-input:focus {
+    outline: none;
+}
+
+.date-picker {
+    margin: 0;
+}
+
+.date-input {
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.date-input:focus {
+    outline: none;
+}
+
+.request-tabs {
+    display: flex;
+    gap: 100px;
+    margin-top: 40px;
+    padding: 0 50px 15px;
+    border-bottom: 1px solid #000;
+}
+
+.request-tabs a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.request-table {
+    width: 100%;
+    margin-top: 40px;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.request-table th,
+.request-table td {
+    padding: 15px 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.request-table th {
+    color: #737373;
+}
+
+.request-table td {
+    color: #737373;
+    font-weight: bold;
+}
+
+.request-table a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.request-detail-card {
+    width: 100%;
+    margin-top: 40px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.request-detail-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    align-items: center;
+    min-height: 85px;
+    padding: 0 60px;
+    border-bottom: 1px solid #ddd;
+}
+
+.request-detail-row:last-child {
+    border-bottom: none;
+}
+
+.request-detail-label {
+    color: #737373;
+    font-weight: bold;
+}
+
+.request-detail-value {
+    font-weight: bold;
+}
+
+.request-detail-value span {
+    margin: 0 50px;
+}
+
+.approval-form {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.approval-button {
+    padding: 10px 35px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.approval-button.approved {
+    background: #696969;
+    cursor: default;
+}

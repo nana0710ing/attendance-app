@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use App\Http\Controllers\AttendanceController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
 
 Route::get('/attendance', [AttendanceController::class, 'index'])
@@ -55,6 +56,16 @@ Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requ
 Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requestList'])
     ->middleware('auth')
     ->name('request.list');
+
+Route::get('/admin/login', function () {
+    return view('admin.login');
+})->name('admin.login');
+
+Route::post('/admin/login', [AdminLoginController::class, 'login'])
+    ->name('admin.login.submit');
+
+Route::post('/admin/logout', [AdminLoginController::class, 'logout'])
+    ->name('admin.logout');
 
 Route::middleware(['auth', 'admin'])->group(function () {
 

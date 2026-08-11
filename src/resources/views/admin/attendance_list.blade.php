@@ -13,9 +13,17 @@
         ← 前日
     </a>
 
-    <strong>
-        {{ \Carbon\Carbon::parse($date)->format('Y/m/d') }}
-    </strong>
+    <form class="date-picker"
+        method="GET"
+        action="{{ route('admin.attendance.list') }}">
+        <input
+            class="date-input"
+            type="date"
+            name="date"
+            value="{{ \Carbon\Carbon::parse($date)->format('Y-m-d') }}"
+            onchange="this.form.submit()"
+        >
+    </form>
 
     <a href="{{ route('admin.attendance.list', [
         'date' => \Carbon\Carbon::parse($date)->addDay()->format('Y-m-d')

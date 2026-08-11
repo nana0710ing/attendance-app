@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>申請一覧（管理者）</title>
-</head>
-<body>
+@extends('layouts.admin')
 
-    <h1>申請一覧</h1>
+@section('content')
 
-    <div>
+    <h1 class="page-title">申請一覧</h1>
+
+    <div class="request-tabs">
         <a href="{{ route('admin.requests', ['status' => 'pending']) }}">
             承認待ち
         </a>
@@ -18,7 +14,7 @@
         </a>
     </div>
 
-    <table border="1">
+    <table class="request-table">
         <thead>
             <tr>
                 <th>状態</th>
@@ -59,5 +55,4 @@
         </tbody>
     </table>
 
-</body>
-</html>
+@endsection

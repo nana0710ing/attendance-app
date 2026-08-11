@@ -25,7 +25,7 @@
 
         <a href="{{ route('admin.requests') }}">申請一覧</a>
 
-        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+        <form action="{{ route('admin.logout') }}" method="POST" style="display: inline;">
             @csrf
             <button type="submit">ログアウト</button>
         </form>

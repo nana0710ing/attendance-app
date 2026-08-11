@@ -1,14 +1,14 @@
 @extends('layouts.guest')
 
-@section('title', 'ログイン')
+@section('title', '管理者ログイン')
 
 @section('content')
 
 <div class="login-container">
 
-    <h1 class="login-title">ログイン</h1>
+    <h1 class="login-title">管理者ログイン</h1>
 
-    <form method="POST" action="{{ route('login') }}" class="login-form">
+    <form method="POST" action="{{ route('admin.login.submit') }}" class="login-form">
         @csrf
 
         <div class="login-form__group">
@@ -17,7 +17,6 @@
                 id="email"
                 type="email"
                 name="email"
-                value="{{ old('email') }}"
             >
         </div>
 
@@ -31,12 +30,8 @@
         </div>
 
         <button type="submit" class="login-button">
-            ログインする
+            管理者ログインする
         </button>
-
-        <a href="{{ route('register') }}" class="register-link">
-            会員登録はこちら
-        </a>
     </form>
 
 </div>
