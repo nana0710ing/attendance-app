@@ -20,41 +20,38 @@ Route::get('/', function () {
 });
 
 Route::get('/attendance', [AttendanceController::class, 'index'])
-    ->middleware('auth');
+    ->middleware(['auth', 'verified']);
 
 Route::post('/attendance/clock-in', [AttendanceController::class, 'clockIn'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('attendance.clock-in');
 
 Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('attendance.clock-out');
 
 Route::post('/attendance/break-start', [AttendanceController::class, 'breakStart'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('attendance.break-start');
 
 Route::post('/attendance/break-end', [AttendanceController::class, 'breakEnd'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('attendance.break-end');
 
 Route::get('/attendance/list', [AttendanceController::class, 'list'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('attendance.list');
 
 Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('attendance.detail');
 
 Route::patch('/attendance/detail/{id}', [AttendanceController::class, 'update'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('attendance.update');
 
 Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requestList'])
-    ->name('request.list');
-
-Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requestList'])
-    ->middleware('auth')
+    ->middleware(['auth', 'verified'])
     ->name('request.list');
 
 Route::get('/admin/login', function () {
