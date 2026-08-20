@@ -54,6 +54,10 @@ Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requ
     ->middleware(['auth', 'verified'])
     ->name('request.list');
 
+Route::get('/attendance/report', [AttendanceController::class, 'report'])
+    ->middleware(['auth', 'verified'])
+    ->name('attendance.report');
+
 Route::get('/admin/login', function () {
     return view('admin.login');
 })->name('admin.login');
@@ -83,6 +87,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/admin/attendance/{id}', [AttendanceController::class, 'adminAttendanceDetail'])
     ->name('admin.attendance.detail');
+
+    Route::patch('/admin/attendance/{id}', [AttendanceController::class, 'adminAttendanceUpdate'])
+    ->name('admin.attendance.update');
 
     Route::get('/admin/attendance', [AttendanceController::class, 'adminAttendanceList'])
     ->name('admin.attendance.list');

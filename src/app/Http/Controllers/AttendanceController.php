@@ -330,6 +330,181 @@ class AttendanceController extends Controller
         return view('admin.staff_attendance_detail', compact('attendance'));
     }
 
+    public function adminAttendanceUpdate(Request $request, $id)
+    {
+        $request->validate(
+            [
+                'clock_in' => ['required'],
+                'clock_out' => ['required', 'after:clock_in'],
+                'break_start.*' => ['nullable'],
+                'break_end.*' => ['nullable', 'after:break_start.*'],
+                'remark' => ['required'],
+            ],
+            [
+                'clock_in.required' => '出勤時間を入力してください。',
+                'clock_out.required' => '退勤時間を入力してください。',
+                'clock_out.after' => '出勤時間もしくは退勤時間が不適切な値です',
+                'break_end.*.after' => '休憩時間が不適切な値です',
+                'remark.required' => '備考を記入してください',
+            ]
+        );
+
+        $attendance = Attendance::with('breakTimes')->findOrFail($id);
+
+        $attendance->update([
+            'clock_in' => $attendance->work_date . ' ' . $request->clock_in . ':00',
+            'clock_out' => $attendance->work_date . ' ' . $request->clock_out . ':00',
+            'remark' => $request->remark,
+        ]);
+
+        foreach ($attendance->breakTimes as $index => $breakTime) {
+            $breakStart = $request->break_start[$index] ?? null;
+            $breakEnd = $request->break_end[$index] ?? null;
+
+            $breakTime->update([
+                'break_start' => $breakStart
+                    ? $attendance->work_date . ' ' . $breakStart . ':00'
+                    : null,
+                'break_end' => $breakEnd
+                    ? $attendance->work_date . ' ' . $breakEnd . ':00'
+                    : null,
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.attendance.detail', $attendance->id);
+    }
+
+    public function report()
+    {
+        $startDate = now()->subMonths(5)->startOfMonth();
+        $endDate = now()->endOfMonth();
+
+        $attendances = Attendance::with('breakTimes')
+            ->where('user_id', auth()->id())
+            ->whereBetween('work_date', [$startDate, $endDate])
+            ->orderBy('work_date')
+            ->get();
+
+        $totalWorkMinutes = 0;
+        $totalOvertimeMinutes = 0;
+        $workedDays = 0;
+
+        foreach ($attendances as $attendance) {
+        if (!$attendance->clock_in || !$attendance->clock_out) {
+            continue;
+        }
+
+        $breakMinutes = 0;
+
+        foreach ($attendance->breakTimes as $breakTime) {
+            if ($breakTime->break_start && $breakTime->break_end) {
+                $breakMinutes += Carbon::parse($breakTime->break_start)
+                    ->diffInMinutes(Carbon::parse($breakTime->break_end));
+            }
+        }
+
+        $workMinutes = Carbon::parse($attendance->clock_in)
+            ->diffInMinutes(Carbon::parse($attendance->clock_out))
+            - $breakMinutes;
+
+        $totalWorkMinutes += $workMinutes;
+
+        $totalOvertimeMinutes += max(0, $workMinutes - 480);
+        $workedDays++;
+        }
+
+            $monthlyData = [];
+
+            for ($i = 5; $i >= 0; $i--) {
+                $month = now()->subMonths($i);
+
+                $monthlyData[$month->format('Y-m')] = [
+                    'label' => $month->format('Y-m'),
+                    'workMinutes' => 0,
+                    'overtimeMinutes' => 0,
+                ];
+            }
+
+            foreach ($attendances as $attendance) {
+                if (!$attendance->clock_in || !$attendance->clock_out) {
+                    continue;
+                }
+
+            $breakMinutes = 0;
+
+            foreach ($attendance->breakTimes as $breakTime) {
+                if ($breakTime->break_start && $breakTime->break_end) {
+                    $breakMinutes += Carbon::parse($breakTime->break_start)
+                        ->diffInMinutes(Carbon::parse($breakTime->break_end));
+                }
+            }
+
+            $workMinutes = Carbon::parse($attendance->clock_in)
+                ->diffInMinutes(Carbon::parse($attendance->clock_out))
+                - $breakMinutes;
+
+            $monthKey = Carbon::parse($attendance->work_date)->format('Y-m');
+
+                if (isset($monthlyData[$monthKey])) {
+                    $monthlyData[$monthKey]['workMinutes'] += $workMinutes;
+                    $monthlyData[$monthKey]['overtimeMinutes'] += max(0, $workMinutes - 480);
+                }
+            }
+
+            $lateCount = 0;
+            $earlyLeaveCount = 0;
+            $longWorkCount = 0;
+
+            $currentMonthAttendances = $attendances->filter(function ($attendance) {
+                return Carbon::parse($attendance->work_date)->isSameMonth(now());
+            });
+
+            foreach ($currentMonthAttendances as $attendance) {
+                if ($attendance->clock_in && Carbon::parse($attendance->clock_in)->format('H:i') > '09:00') {
+                $lateCount++;
+                }
+
+                if ($attendance->clock_out && Carbon::parse($attendance->clock_out)->format('H:i') < '18:00') {
+                $earlyLeaveCount++;
+                }
+
+                if ($attendance->clock_in && $attendance->clock_out) {
+                $breakMinutes = 0;
+
+                    foreach ($attendance->breakTimes as $breakTime) {
+                        if ($breakTime->break_start && $breakTime->break_end) {
+                        $breakMinutes += Carbon::parse($breakTime->break_start)
+                            ->diffInMinutes(Carbon::parse($breakTime->break_end));
+                        }
+                    }
+
+                $workMinutes = Carbon::parse($attendance->clock_in)
+                    ->diffInMinutes(Carbon::parse($attendance->clock_out))
+                    - $breakMinutes;
+
+                if ($workMinutes > 600) {
+                    $longWorkCount++;
+                }
+                }
+            }
+
+        $averageWorkMinutes = $workedDays > 0
+            ? intdiv($totalWorkMinutes, $workedDays)
+            : 0;
+
+        return view('attendance_report', compact(
+            'attendances',
+            'totalWorkMinutes',
+            'totalOvertimeMinutes',
+            'averageWorkMinutes',
+            'monthlyData',
+            'lateCount',
+            'earlyLeaveCount',
+            'longWorkCount'
+        ));
+    }
+
     public function exportCsv(Request $request, User $user)
     {
         $month = Carbon::parse($request->month ?? now()->format('Y-m'));
