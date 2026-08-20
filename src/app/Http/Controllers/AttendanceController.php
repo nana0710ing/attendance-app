@@ -302,9 +302,9 @@ class AttendanceController extends Controller
         return view('admin.request_detail', compact('request'));
     }
 
-    public function approveRequest($id)
+    public function approveRequest($attendance_correct_request_id)
     {
-        $request = StampCorrectionRequest::findOrFail($id);
+        $request = StampCorrectionRequest::findOrFail($attendance_correct_request_id);
 
         $attendance = $request->attendance;
 

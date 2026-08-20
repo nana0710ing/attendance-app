@@ -76,23 +76,24 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/requests/{id}', [AttendanceController::class, 'adminRequestDetail'])
     ->name('admin.requests.detail');
 
-    Route::patch('/admin/requests/{id}/approve', [AttendanceController::class, 'approveRequest'])
+    Route::patch('/stamp_correction_request/approve/{attendance_correct_request_id}',
+    [AttendanceController::class, 'approveRequest'])
     ->name('admin.requests.approve');
 
-    Route::get('/admin/staff', [AttendanceController::class, 'staffList'])
+    Route::get('/admin/staff/list', [AttendanceController::class, 'staffList'])
     ->name('admin.staff.list');
 
-    Route::get('/admin/staff/{id}', [AttendanceController::class, 'staffAttendance'])
+    Route::get('/admin/attendance/staff/{id}', [AttendanceController::class, 'staffAttendance'])
     ->name('admin.staff.attendance');
+
+     Route::get('/admin/attendance/list', [AttendanceController::class, 'adminAttendanceList'])
+    ->name('admin.attendance.list');
 
     Route::get('/admin/attendance/{id}', [AttendanceController::class, 'adminAttendanceDetail'])
     ->name('admin.attendance.detail');
 
     Route::patch('/admin/attendance/{id}', [AttendanceController::class, 'adminAttendanceUpdate'])
     ->name('admin.attendance.update');
-
-    Route::get('/admin/attendance', [AttendanceController::class, 'adminAttendanceList'])
-    ->name('admin.attendance.list');
 
     Route::get('/admin/staff/{user}/csv', [AttendanceController::class, 'exportCsv'])
     ->name('admin.staff.csv');
