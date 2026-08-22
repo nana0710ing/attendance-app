@@ -27,6 +27,11 @@ class AttendanceRecordController extends Controller
             $query->whereDate('work_date', $request->date);
         }
 
+        if ($request->filled('month')) {
+            $query->whereYear('work_date', substr($request->month, 0, 4))
+                ->whereMonth('work_date', substr($request->month, 5, 2));
+        }
+
         $perPage = min((int) $request->input('per_page', 20), 100);
 
         $attendances = $query
@@ -44,17 +49,25 @@ class AttendanceRecordController extends Controller
         $validated = $request->validated();
 
         $attendance = Attendance::create([
-            'user_id' => $validated['user_id'],
-            'work_date' => $validated['work_date'],
-            'clock_in' => $validated['work_date'] . ' ' . $validated['clock_in'],
+            'user_id' => $request->user()->id,
+            'work_date' => $validated['date'],
+            'clock_in' => $validated['date'] . ' ' . $validated['clock_in'],
             'clock_out' => isset($validated['clock_out'])
-                ? $validated['work_date'] . ' ' . $validated['clock_out']
+                ? $validated['date'] . ' ' . $validated['clock_out']
                 : null,
-            'remark' => $validated['remark'] ?? null,
+            'remark' => $validated['comment'] ?? null,
             'status' => '勤務中',
         ]);
 
-        return response()->json($attendance, 201);
+        $attendance->load([
+            'user',
+            'breakTimes',
+            'stampCorrectionRequests',
+        ]);
+
+        return (new AttendanceRecordResource($attendance))
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
@@ -82,7 +95,7 @@ class AttendanceRecordController extends Controller
 
         $validated = $request->validated();
 
-        $workDate = $validated['work_date'] ?? $attendance->work_date;
+        $workDate = $validated['date'] ?? $attendance->work_date;
 
         if (isset($validated['clock_in'])) {
             $validated['clock_in'] = $workDate . ' ' . $validated['clock_in'];
@@ -90,13 +103,37 @@ class AttendanceRecordController extends Controller
 
         if (array_key_exists('clock_out', $validated)) {
             $validated['clock_out'] = $validated['clock_out']
-                ? $workDate . ' ' . $validated['clock_out']
-                : null;
+            ? $workDate . ' ' . $validated['clock_out']
+            : null;
         }
 
-        $attendance->update($validated);
+        $updateData = [];
 
-        return response()->json($attendance);
+        if (array_key_exists('date', $validated)) {
+        $updateData['work_date'] = $validated['date'];
+        }
+
+        if (array_key_exists('clock_in', $validated)) {
+        $updateData['clock_in'] = $validated['clock_in'];
+        }
+
+        if (array_key_exists('clock_out', $validated)) {
+        $updateData['clock_out'] = $validated['clock_out'];
+        }
+
+        if (array_key_exists('comment', $validated)) {
+        $updateData['remark'] = $validated['comment'];
+        }
+
+        $attendance->update($updateData);
+
+        $attendance->load([
+            'user',
+            'breakTimes',
+            'stampCorrectionRequests',
+        ]);
+
+            return new AttendanceRecordResource($attendance);
     }
 
     /**

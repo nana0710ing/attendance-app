@@ -27,7 +27,7 @@ class UpdateAttendanceRecordRequest extends FormRequest
         $attendance = Attendance::find($attendanceId);
 
         return [
-            'work_date' => [
+            'date' => [
             'sometimes',
             'date_format:Y-m-d',
             Rule::unique('attendances', 'work_date')
@@ -36,19 +36,20 @@ class UpdateAttendanceRecordRequest extends FormRequest
             ],
             'clock_in' => ['sometimes', 'date_format:H:i:s'],
             'clock_out' => ['nullable', 'date_format:H:i:s', 'after:clock_in'],
-            'remark' => ['nullable', 'string', 'max:255'],
+            'comment' => ['nullable', 'string', 'max:255'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'work_date.date_format' => '勤務日はYYYY-MM-DD形式で入力してください。',
-            'work_date.unique' => 'この勤務日の勤怠記録はすでに存在します。',
-            'clock_in.date_format' => '出勤時刻はHH:MM:SS形式で入力してください。',
-            'clock_out.date_format' => '退勤時刻はHH:MM:SS形式で入力してください。',
-            'remark.string' => '備考は文字列で入力してください。',
-            'remark.max' => '備考は255文字以内で入力してください。',
+            'date.date_format' => '勤怠日はYYYY-MM-DD形式で指定してください。',
+            'date.unique' => 'この日付の勤怠は既に登録されています。',
+            'clock_in.date_format' => '出勤時刻はHH:MM:SS形式で指定してください。',
+            'clock_out.date_format' => '退勤時刻はHH:MM:SS形式で指定してください。',
+            'clock_out.after' => '退勤時刻は出勤時刻より後の時刻を指定してください。',
+            'comment.string' => '備考は文字列で入力してください。',
+            'comment.max' => '備考は255文字以内で入力してください。',
         ];
     }
 }

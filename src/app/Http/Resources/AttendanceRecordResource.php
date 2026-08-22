@@ -17,14 +17,19 @@ class AttendanceRecordResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'user_name' => $this->user?->name,
-            'work_date' => $this->work_date,
+            'user' => new UserResource($this->whenLoaded('user')),
+            'date' => $this->work_date,
             'clock_in' => $this->clock_in,
             'clock_out' => $this->clock_out,
-            'status' => $this->status,
-            'remark' => $this->remark,
-            'approval_status' => $this->approval_status,
-            'break_times' => $this->breakTimes,
+            'total_time' => $this->total_time,
+            'total_break_time' => $this->total_break_time,
+            'comment' => $this->remark,
+            'breaks' => AttendanceBreakResource::collection(
+                $this->whenLoaded('breakTimes')
+            ),
+            'applications' => ApplicationResource::collection(
+                $this->whenLoaded('stampCorrectionRequests')
+            ),
         ];
     }
 }

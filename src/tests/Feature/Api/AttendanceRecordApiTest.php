@@ -41,12 +41,10 @@ class AttendanceRecordApiTest extends TestCase
         Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/attendance-records', [
-            'user_id' => $user->id,
-            'work_date' => '2026-09-02',
+            'date' => '2026-08-23',
             'clock_in' => '09:00:00',
             'clock_out' => '17:00:00',
-            'status' => '退勤済',
-            'remark' => 'APIテスト',
+            'comment' => 'APIテスト',
         ]);
 
         $response->assertStatus(201);
@@ -209,7 +207,7 @@ class AttendanceRecordApiTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['work_date']);
+        $response->assertJsonValidationErrors(['date']);
     }
 
     public function test_duplicate_work_date_cannot_be_created(): void
@@ -236,7 +234,7 @@ class AttendanceRecordApiTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['work_date']);
+        $response->assertJsonValidationErrors(['date']);
     }
 
     public function test_clock_out_must_be_after_clock_in(): void
@@ -256,5 +254,28 @@ class AttendanceRecordApiTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['clock_out']);
+    }
+
+    public function test_can_filter_attendances_by_month(): void
+    {
+        $user = User::factory()->create();
+
+        Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => '2026-05-10',
+            'status' => 'finished',
+        ]);
+
+        Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => '2026-06-10',
+            'status' => 'finished',
+        ]);
+
+        $response = $this->getJson('/api/v1/attendance-records?month=2026-05');
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.date', '2026-05-10');
     }
 }
