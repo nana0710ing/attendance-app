@@ -6,6 +6,8 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -34,6 +36,16 @@ class Handler extends ExceptionHandler
                 return response()->json([
                     'error' => 'この操作を実行する権限がありません。',
                 ], 403);
+            }
+        });
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+            if (
+                 $request->is('api/*') &&
+                 $e->getPrevious() instanceof ModelNotFoundException
+            ) {
+                return response()->json([
+                    'error' => '勤怠情報が見つかりませんでした。',
+                ], 404);
             }
         });
     }
