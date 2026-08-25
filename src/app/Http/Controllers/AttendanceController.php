@@ -132,9 +132,9 @@ class AttendanceController extends Controller
             [
                 'clock_in.required' => '出勤時間を入力してください。',
                 'clock_out.required' => '退勤時間を入力してください。',
-                'clock_out.after' => '退勤時間は出勤時間より後の時間を入力してください。',
+                'clock_out.after' => '出勤時間が不適切な値です',
                 'break_end.*.after' => '休憩終了時間は休憩開始時間より後の時間を入力してください。',
-                'remark.required' => '備考を入力してください。',
+                'remark.required' => '備考を記入してください',
             ]
         );
         if ($request->clock_in && $request->clock_out) {
@@ -151,7 +151,7 @@ class AttendanceController extends Controller
                 ) {
                     return back()
                         ->withErrors([
-                            'break_start' => '休憩時間もしくは退勤時間が不適切な値です'
+                            'break_start' => '休憩時間が不適切な値です'
                         ])
                         ->withInput();
                 }
@@ -348,6 +348,42 @@ class AttendanceController extends Controller
                 'remark.required' => '備考を記入してください',
             ]
         );
+
+        if ($request->clock_in && $request->clock_out) {
+
+            foreach ($request->break_start ?? [] as $index => $breakStart) {
+
+                if (!$breakStart) {
+                    continue;
+                }
+
+                if (
+                    $breakStart < $request->clock_in ||
+                    $breakStart > $request->clock_out
+                ) {
+                    return back()
+                        ->withErrors([
+                            'break_start' => '休憩時間が不適切な値です'
+                        ])
+                        ->withInput();
+                }
+            }
+
+            foreach ($request->break_end ?? [] as $index => $breakEnd) {
+
+                if (!$breakEnd) {
+                    continue;
+                }
+
+                if ($breakEnd > $request->clock_out) {
+                    return back()
+                        ->withErrors([
+                            'break_end' => '休憩時間もしくは退勤時間が不適切な値です'
+                        ])
+                        ->withInput();
+                }
+            }
+        }
 
         $attendance = Attendance::with('breakTimes')->findOrFail($id);
 
