@@ -222,10 +222,10 @@ class AttendanceController extends Controller
     {
         $status = $request->status ?? 'pending';
 
-        $requests = StampCorrectionRequest::where('user_id', auth()->id())
+        $requests = StampCorrectionRequest::with(['user', 'attendance'])
+            ->where('user_id', auth()->id())
             ->where('approval_status', $status)
             ->get();
-
         return view('attendance.request_list', compact('status', 'requests'));
     }
 
@@ -233,7 +233,8 @@ class AttendanceController extends Controller
     {
         $status = $request->status ?? 'pending';
 
-        $requests = StampCorrectionRequest::where('approval_status', $status)
+        $requests = StampCorrectionRequest::with(['user', 'attendance'])
+            ->where('approval_status', $status)
             ->get();
 
         return view('admin.request_list', compact('status', 'requests'));
