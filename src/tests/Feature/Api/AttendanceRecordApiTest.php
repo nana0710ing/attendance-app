@@ -278,4 +278,113 @@ class AttendanceRecordApiTest extends TestCase
         $response->assertJsonCount(1, 'data');
         $response->assertJsonPath('data.0.date', '2026-05-10');
     }
+
+    public function test_attendance_record_detail_can_be_retrieved(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => '2026-08-20',
+            'clock_in' => '2026-08-20 09:00:00',
+            'clock_out' => '2026-08-20 18:00:00',
+            'remark' => 'API詳細テスト',
+        ]);
+
+        $response = $this->getJson(
+            '/api/v1/attendance-records/' . $attendance->id
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJsonPath(
+            'data.id',
+            $attendance->id
+        );
+    }
+
+    public function test_nonexistent_attendance_record_returns_404(): void
+    {
+        $response = $this->getJson(
+            '/api/v1/attendance-records/99999'
+        );
+
+        $response->assertStatus(404);
+    }
+
+    public function test_update_nonexistent_attendance_record_returns_404(): void
+    {
+        $user = User::factory()->create([
+            'is_admin' => 1,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->putJson(
+            '/api/v1/attendance-records/99999',
+            [
+                'date' => '2026-08-20',
+                'clock_in' => '09:00:00',
+                'clock_out' => '18:00:00',
+            ]
+        );
+
+        $response->assertStatus(404);
+    }
+
+    public function test_delete_nonexistent_attendance_record_returns_404(): void
+    {
+        $user = User::factory()->create([
+            'is_admin' => 1,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->deleteJson(
+            '/api/v1/attendance-records/99999'
+        );
+
+        $response->assertStatus(404);
+    }
+
+    public function test_attendance_record_cannot_be_updated_without_authentication(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => '2026-08-20',
+            'clock_in' => '2026-08-20 09:00:00',
+            'clock_out' => '2026-08-20 18:00:00',
+        ]);
+
+        $response = $this->putJson(
+            '/api/v1/attendance-records/' . $attendance->id,
+            [
+                'date' => '2026-08-20',
+                'clock_in' => '10:00:00',
+                'clock_out' => '18:00:00',
+            ]
+        );
+
+        $response->assertStatus(401);
+    }
+
+    public function test_attendance_record_cannot_be_deleted_without_authentication(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => '2026-08-20',
+            'clock_in' => '2026-08-20 09:00:00',
+            'clock_out' => '2026-08-20 18:00:00',
+        ]);
+
+        $response = $this->deleteJson(
+            '/api/v1/attendance-records/' . $attendance->id
+        );
+
+        $response->assertStatus(401);
+    }
 }
