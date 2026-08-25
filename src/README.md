@@ -87,4 +87,6 @@ php artisan migrate --seed
 ## URL
 
 - 開発環境：http://localhost:8080/
+- 一般ユーザーログイン：http://localhost:8080/login
+- 管理者ログイン：http://localhost:8080/admin/login
 - phpMyAdmin：http://localhost:8081/
