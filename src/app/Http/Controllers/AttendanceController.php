@@ -497,34 +497,42 @@ class AttendanceController extends Controller
                 return Carbon::parse($attendance->work_date)->isSameMonth(now());
             });
 
-            foreach ($currentMonthAttendances as $attendance) {
-                if ($attendance->clock_in && Carbon::parse($attendance->clock_in)->format('H:i') > '09:00') {
-                $lateCount++;
-                }
+            $lateCount = $currentMonthAttendances
+                ->filter(function ($attendance) {
+                    return $attendance->clock_in
+                        && Carbon::parse($attendance->clock_in)->format('H:i') > '09:00';
+                })
+                ->count();
 
-                if ($attendance->clock_out && Carbon::parse($attendance->clock_out)->format('H:i') < '18:00') {
-                $earlyLeaveCount++;
-                }
+            $earlyLeaveCount = $currentMonthAttendances
+                ->filter(function ($attendance) {
+                    return $attendance->clock_out
+                        && Carbon::parse($attendance->clock_out)->format('H:i') < '18:00';
+                })
+                ->count();
 
-                if ($attendance->clock_in && $attendance->clock_out) {
-                $breakMinutes = 0;
-
-                    foreach ($attendance->breakTimes as $breakTime) {
-                        if ($breakTime->break_start && $breakTime->break_end) {
-                        $breakMinutes += Carbon::parse($breakTime->break_start)
-                            ->diffInMinutes(Carbon::parse($breakTime->break_end));
-                        }
+            $longWorkCount = $currentMonthAttendances
+                ->filter(function ($attendance) {
+                    if (!$attendance->clock_in || !$attendance->clock_out) {
+                        return false;
                     }
 
-                $workMinutes = Carbon::parse($attendance->clock_in)
-                    ->diffInMinutes(Carbon::parse($attendance->clock_out))
-                    - $breakMinutes;
+                    $breakMinutes = $attendance->breakTimes
+                        ->filter(function ($breakTime) {
+                            return $breakTime->break_start && $breakTime->break_end;
+                        })
+                        ->sum(function ($breakTime) {
+                            return Carbon::parse($breakTime->break_start)
+                                ->diffInMinutes(Carbon::parse($breakTime->break_end));
+                        });
 
-                if ($workMinutes > 600) {
-                    $longWorkCount++;
-                }
-                }
-            }
+                    $workMinutes = Carbon::parse($attendance->clock_in)
+                        ->diffInMinutes(Carbon::parse($attendance->clock_out))
+                        - $breakMinutes;
+
+                    return $workMinutes > 600;
+                })
+                ->count();
 
         $averageWorkMinutes = $workedDays > 0
             ? intdiv($totalWorkMinutes, $workedDays)
