@@ -90,3 +90,4 @@ php artisan migrate --seed
 - 一般ユーザーログイン：http://localhost:8080/login
 - 管理者ログイン：http://localhost:8080/admin/login
 - phpMyAdmin：http://localhost:8081/
+- MailHog：http://localhost:8025/
