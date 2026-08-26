@@ -256,5 +256,6 @@ class AttendanceCorrectionTest extends TestCase
             ->get('/attendance/detail/' . $attendance->id);
 
         $response->assertStatus(200);
+        $response->assertSee('承認待ちのため修正はできません。');
     }
 }
